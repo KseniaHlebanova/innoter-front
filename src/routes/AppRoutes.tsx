@@ -1,5 +1,6 @@
 import { Route, Routes } from 'react-router-dom';
 import { AuthenticatedLayout } from '../layouts/AuthenticatedLayout';
+import { AuthLayout } from '../layouts/AuthLayout';
 import { PublicLayout } from '../layouts/PublicLayout';
 import { CreatePostPage } from '../pages/CreatePostPage/CreatePostPage';
 import { GlobalFeedPage } from '../pages/GlobalFeedPage/GlobalFeedPage';
@@ -14,8 +15,11 @@ export function AppRoutes() {
     <Routes>
       <Route element={<PublicLayout />}>
         <Route path="/" element={<GlobalFeedPage />} />
-        <Route path="/login" element={<LoginPage />} />
+
         <Route path="/signup" element={<SignupPage />} />
+      </Route>
+      <Route element={<AuthLayout />}>
+        <Route path="/login" element={<LoginPage />} />
       </Route>
       <Route element={<ProtectedRoute />}>
         <Route element={<AuthenticatedLayout />}>
