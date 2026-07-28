@@ -1,0 +1,10 @@
+.signup-page__form {
+  display: grid;
+}
+.signup-page__login {
+  color: #5e6878;
+  margin: 2rem 0 0;
+}
+.signup-page__login a {
+  color: #1670e8;
+}

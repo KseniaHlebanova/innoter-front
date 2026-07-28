@@ -15,11 +15,10 @@ export function AppRoutes() {
     <Routes>
       <Route element={<PublicLayout />}>
         <Route path="/" element={<GlobalFeedPage />} />
-
-        <Route path="/signup" element={<SignupPage />} />
       </Route>
       <Route element={<AuthLayout />}>
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/signup" element={<SignupPage />} />
       </Route>
       <Route element={<ProtectedRoute />}>
         <Route element={<AuthenticatedLayout />}>
