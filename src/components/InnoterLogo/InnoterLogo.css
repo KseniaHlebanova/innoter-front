@@ -1,0 +1,8 @@
+.innoter-logo {
+  align-items: center;
+  display: inline-flex;
+  gap: 0.625rem;
+}
+.innoter-logo__icon {
+  height: 1.5rem;
+}

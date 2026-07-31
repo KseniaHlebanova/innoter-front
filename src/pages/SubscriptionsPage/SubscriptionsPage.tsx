@@ -1,8 +1,14 @@
+import { useEffect, useState } from 'react';
+import { Feed } from '../../components/Feed/Feed';
+import { getSubscriptionsFeed } from '../../services/feedService';
+import type { Post } from '../../types/post';
+
 export function SubscriptionsPage() {
-  return (
-    <section>
-      <h1>Subscriptions</h1>
-      <p>Authenticated feed placeholder.</p>
-    </section>
-  );
+  const [posts, setPosts] = useState<Post[]>([]);
+
+  useEffect(() => {
+    void getSubscriptionsFeed().then(setPosts);
+  }, []);
+
+  return <Feed posts={posts} />;
 }
