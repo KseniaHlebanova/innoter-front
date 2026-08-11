@@ -5,6 +5,12 @@ import { AuthFormCard } from '../../components/AuthFormCard/AuthFormCard';
 import { PrimaryButton } from '../../components/PrimaryButton/PrimaryButton';
 import { TextField } from '../../components/TextField/TextField';
 import './LoginPage.css';
+import { loginUser } from '../../api/auth';
+import { ApiError } from '../../api/httpClient';
+import { useNavigate } from 'react-router-dom';
+import { useAppDispatch } from '../../store/hooks';
+import { setAuthenticated } from '../../store/authSlice';
+import { saveTokens } from '../../api/tokenStorage';
 
 interface LoginFormValues {
   email: string;
@@ -24,6 +30,9 @@ const validationSchema = Yup.object({
 });
 
 export function LoginPage() {
+  const navigate = useNavigate();
+  const dispatch = useAppDispatch();
+
   const formik = useFormik<LoginFormValues>({
     initialValues: {
       email: '',
@@ -33,10 +42,19 @@ export function LoginPage() {
     validationSchema,
     onSubmit: async (values, { setSubmitting, setFieldError }) => {
       try {
-        // TODO: replace with real API call to UMS:
-        console.log('submitting', values);
+        const tokens = await loginUser({
+          email: values.email,
+          password: values.password,
+        });
+        saveTokens(tokens, values.rememberMe);
+        dispatch(setAuthenticated(true));
+        navigate('/');
       } catch (err) {
-        setFieldError('password', 'Invalid email or password');
+        if (err instanceof ApiError) {
+          setFieldError('password', err.message);
+        } else {
+          setFieldError('password', 'Something went wrong, please try again');
+        }
         console.log(err);
       } finally {
         setSubmitting(false);
