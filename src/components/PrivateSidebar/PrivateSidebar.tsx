@@ -45,7 +45,7 @@ function LogoutIcon() {
 export function PrivateSidebar() {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const user = useAppSelector((state) => state.auth.user); // ДОБАВЛЕНО
+  const user = useAppSelector((state) => state.auth.user);
 
   function handleLogout() {
     clearTokens();
