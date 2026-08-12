@@ -1,10 +1,18 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { AuthFormCard } from '../../components/AuthFormCard/AuthFormCard';
 import { PrimaryButton } from '../../components/PrimaryButton/PrimaryButton';
 import { PhoneField } from '../../components/PhoneField/PhoneField';
 import { TextField } from '../../components/TextField/TextField';
+import { signupUser, loginUser } from '../../api/auth';
+import { getCurrentUser } from '../../api/user';
+import { mapUserApiProfileToUser } from '../../api/mappers/userMapper';
+import { ApiError } from '../../api/httpClient';
+import { saveTokens } from '../../api/tokenStorage';
+import { useAppDispatch } from '../../store/hooks';
+import { setAuthenticated, setUser } from '../../store/authSlice';
+import type { SignupPayload } from '../../types/auth';
 import './SignupPage.css';
 
 interface SignupFormValues {
@@ -47,6 +55,9 @@ const validationSchema = Yup.object({
 });
 
 export function SignupPage() {
+  const navigate = useNavigate();
+  const dispatch = useAppDispatch();
+
   const formik = useFormik<SignupFormValues>({
     initialValues: {
       firstName: '',
@@ -59,11 +70,35 @@ export function SignupPage() {
     validationSchema,
     onSubmit: async (values, { setSubmitting, setFieldError }) => {
       try {
-        // TODO: replace with real API call to UMS:
-        console.log('submitting', values);
+        const signupPayload: SignupPayload = {
+          name: values.firstName,
+          surname: values.lastName,
+          username: values.username,
+          password: values.password,
+          email: values.email,
+          ...(values.phoneNumber ? { phone_number: values.phoneNumber } : {}),
+        };
+
+        await signupUser(signupPayload);
+
+        const tokens = await loginUser({
+          email: values.email,
+          password: values.password,
+        });
+        saveTokens(tokens, true);
+        dispatch(setAuthenticated(true));
+
+        const profile = await getCurrentUser();
+        dispatch(setUser(mapUserApiProfileToUser(profile)));
+
+        navigate('/');
       } catch (err) {
-        setFieldError('username', 'Something went wrong, please try again');
-        console.error(err);
+        if (err instanceof ApiError) {
+          setFieldError('username', err.message);
+        } else {
+          setFieldError('username', 'Something went wrong, please try again');
+        }
+        console.log(err);
       } finally {
         setSubmitting(false);
       }

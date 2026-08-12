@@ -14,7 +14,10 @@ const meta = {
       const store = configureStore({
         reducer: { auth: authReducer },
         preloadedState: {
-          auth: { isAuthenticated: context.parameters.isAuthenticated ?? false },
+          auth: {
+            isAuthenticated: context.parameters.isAuthenticated ?? false,
+            user: null,
+          },
         },
       });
 
@@ -32,7 +35,9 @@ const meta = {
     },
   ],
 } satisfies Meta<typeof AuthAwareFeedLayout>;
+
 export default meta;
 type Story = StoryObj<typeof meta>;
+
 export const Public: Story = { parameters: { isAuthenticated: false } };
 export const Private: Story = { parameters: { isAuthenticated: true } };

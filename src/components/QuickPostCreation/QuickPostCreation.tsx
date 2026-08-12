@@ -1,15 +1,18 @@
 import { Link } from 'react-router-dom';
 import { Avatar } from '../Avatar/Avatar';
-import { mockCurrentUser } from '../../features/feed/data/mockCurrentUser';
+import { useAppSelector } from '../../store/hooks';
 import './QuickPostCreation.css';
 import mediaIcon from '../../assets/icons/icons8-image-96.png';
+import { DEFAULT_AVATAR_URL } from '../../assets/defaultAvatar';
 
 export function QuickPostCreation() {
+  const user = useAppSelector((state) => state.auth.user);
+
   return (
     <section className="quick-post-creation" aria-label="Create a quick post">
       <Avatar
-        src={mockCurrentUser.avatarUrl}
-        alt={`${mockCurrentUser.displayName} avatar`}
+        src={user?.avatarUrl ?? DEFAULT_AVATAR_URL}
+        alt={user ? `${user.displayName} avatar` : 'User avatar'}
         size="lg"
       />
       <div className="quick-post-creation__content">

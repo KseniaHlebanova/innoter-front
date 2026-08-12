@@ -1,10 +1,12 @@
 import type { Post } from '../../../types/post';
+import { Role } from '../../../types/role';
 
 const annie = {
   id: 'user-annie',
   displayName: 'Annie',
   username: 'annie',
   avatarUrl: 'https://i.pravatar.cc/150?u=annie',
+  role: Role.USER,
 };
 
 const jorge = {
@@ -12,6 +14,7 @@ const jorge = {
   displayName: 'Jorge Mckinney',
   username: 'traviswade',
   avatarUrl: 'https://i.pravatar.cc/150?u=jorge',
+  role: Role.USER,
 };
 
 const serenity = {
@@ -19,6 +22,7 @@ const serenity = {
   displayName: 'Serenity Jones',
   username: 'crystalrobinson',
   avatarUrl: 'https://i.pravatar.cc/150?u=serenity',
+  role: Role.USER,
 };
 
 const marcus = {
@@ -26,6 +30,7 @@ const marcus = {
   displayName: 'Marcus Lee',
   username: 'marcuslee',
   avatarUrl: 'https://i.pravatar.cc/150?u=marcus',
+  role: Role.USER,
 };
 
 const elena = {
@@ -33,6 +38,7 @@ const elena = {
   displayName: 'Elena Petrova',
   username: 'elena_p',
   avatarUrl: 'https://i.pravatar.cc/150?u=elena',
+  role: Role.USER,
 };
 
 export const subscriptionFeedPosts: Post[] = [

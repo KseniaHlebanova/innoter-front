@@ -1,6 +1,8 @@
 import { API_BASE_URL } from './config';
 import type { LoginPayload, RefreshPayload, Tokens } from '../types/auth';
 import { apiPost, ApiError } from './httpClient';
+import type { SignupPayload } from '../types/auth';
+import type { UserApiProfile } from '../types/user';
 
 export function loginUser(payload: LoginPayload): Promise<Tokens> {
   return apiPost<Tokens, LoginPayload>('/auth/login', payload);
@@ -24,4 +26,8 @@ export async function refreshTokens(payload: RefreshPayload): Promise<Tokens> {
   }
 
   return data as Tokens;
+}
+
+export function signupUser(payload: SignupPayload): Promise<UserApiProfile> {
+  return apiPost<UserApiProfile, SignupPayload>('/auth/signup', payload);
 }
