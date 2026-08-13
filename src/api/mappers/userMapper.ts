@@ -8,5 +8,9 @@ export function mapUserApiProfileToUser(profile: UserApiProfile): User {
     username: profile.username,
     avatarUrl: DEFAULT_AVATAR_URL,
     role: profile.role,
+    name: profile.name,
+    surname: profile.surname,
+    email: profile.email,
+    phoneNumber: profile.phone_number,
   };
 }

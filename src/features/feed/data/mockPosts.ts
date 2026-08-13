@@ -7,6 +7,10 @@ const annie = {
   username: 'annie',
   avatarUrl: 'https://i.pravatar.cc/150?u=annie',
   role: RoleEnum.USER,
+  name: 'Annie',
+  surname: 'Muernova',
+  email: 'annie@gmail.com',
+  phoneNumber: '+375256994957',
 };
 
 const jorge = {
@@ -15,6 +19,10 @@ const jorge = {
   username: 'traviswade',
   avatarUrl: 'https://i.pravatar.cc/150?u=jorge',
   role: RoleEnum.USER,
+  name: 'Jorge',
+  surname: 'Mckinney',
+  email: 'jorge.mckinney@gmail.com',
+  phoneNumber: '+375291234567',
 };
 
 const serenity = {
@@ -23,6 +31,10 @@ const serenity = {
   username: 'crystalrobinson',
   avatarUrl: 'https://i.pravatar.cc/150?u=serenity',
   role: RoleEnum.USER,
+  name: 'Serenity',
+  surname: 'Jones',
+  email: 'serenity.jones@gmail.com',
+  phoneNumber: '+375293456789',
 };
 
 const marcus = {
@@ -31,6 +43,10 @@ const marcus = {
   username: 'marcuslee',
   avatarUrl: 'https://i.pravatar.cc/150?u=marcus',
   role: RoleEnum.USER,
+  name: 'Marcus',
+  surname: 'Lee',
+  email: 'marcus.lee@gmail.com',
+  phoneNumber: '+375297654321',
 };
 
 const elena = {
@@ -39,6 +55,10 @@ const elena = {
   username: 'elena_p',
   avatarUrl: 'https://i.pravatar.cc/150?u=elena',
   role: RoleEnum.USER,
+  name: 'Elena',
+  surname: 'Petrova',
+  email: 'elena.petrova@gmail.com',
+  phoneNumber: '+375251112233',
 };
 
 export const subscriptionFeedPosts: Post[] = [

@@ -6,6 +6,10 @@ export interface User {
   username: string;
   avatarUrl: string;
   role: Role;
+  name: string;
+  surname: string;
+  email: string;
+  phoneNumber: string | null;
 }
 
 export interface UserApiProfile {
