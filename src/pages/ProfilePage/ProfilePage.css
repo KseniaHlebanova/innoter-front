@@ -66,6 +66,7 @@
 .profile-page__label {
   color: #0f172a;
   font-weight: 500;
+  padding-top: 0.125rem;
 }
 
 .profile-page__input {
@@ -75,7 +76,7 @@
   font-size: 1rem;
   outline: none;
   text-align: right;
-  width: 60%;
+  width: 100%;
 }
 
 .profile-page__input:focus {
@@ -102,4 +103,17 @@
 }
 .retry-button {
   width: 30%;
+}
+
+.profile-page__field {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  width: 60%;
+}
+
+.profile-page__error {
+  color: #d92d20;
+  font-size: 0.8125rem;
+  margin-top: 0.25rem;
 }

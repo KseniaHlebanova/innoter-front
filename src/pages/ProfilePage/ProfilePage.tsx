@@ -1,10 +1,28 @@
 import { useFormik } from 'formik';
+import * as Yup from 'yup';
 import { Avatar } from '../../components/Avatar/Avatar';
 import { PrimaryButton } from '../../components/PrimaryButton/PrimaryButton';
 import { useAppSelector } from '../../store/hooks';
 import { useLoadCurrentUser } from '../../app/AuthBootstrap';
 import { PrimaryButton } from '../../components/PrimaryButton/PrimaryButton';
+import {
+  emailSchema,
+  phoneSchema,
+  requiredTextSchema,
+  usernameSchema,
+} from '../../validation/fieldSchemas';
+import { IMaskInput } from 'react-imask';
+import type { ComponentType, InputHTMLAttributes } from 'react';
+import type { ReactMaskProps } from 'react-imask';
+import type { MaskedPatternOptions } from 'imask';
+import { phoneMaskOptions } from '../../components/PhoneField/phoneMask';
 import './ProfilePage.css';
+
+type PatternMaskInputProps = MaskedPatternOptions &
+  Omit<InputHTMLAttributes<HTMLInputElement>, 'onChange'> &
+  Pick<ReactMaskProps<HTMLInputElement>, 'onAccept' | 'unmask'>;
+
+const PatternMaskInput = IMaskInput as ComponentType<PatternMaskInputProps>;
 
 interface ProfileFormValues {
   firstName: string;
@@ -13,6 +31,14 @@ interface ProfileFormValues {
   phoneNumber: string;
   username: string;
 }
+
+const validationSchema = Yup.object({
+  firstName: requiredTextSchema('First name'),
+  lastName: requiredTextSchema('Last name'),
+  email: emailSchema,
+  phoneNumber: phoneSchema,
+  username: usernameSchema,
+});
 
 function EditIcon() {
   return (
@@ -44,9 +70,16 @@ export function ProfilePage() {
       phoneNumber: user?.phoneNumber ?? '',
       username: user?.username ?? '',
     },
-    onSubmit: (values) => {
-      // TODO: подключить реальный запрос на обновление профиля
-      console.log('submitting profile update', values);
+    validationSchema,
+    onSubmit: async (values, { setSubmitting }) => {
+      try {
+        // TODO: подключить реальный запрос на обновление профиля
+        console.log('submitting profile update', values);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setSubmitting(false);
+      }
     },
   });
 
@@ -83,75 +116,108 @@ export function ProfilePage() {
           <p className="profile-page__email">{user.email}</p>
         </div>
       </header>
-      <form className="profile-page__form" onSubmit={formik.handleSubmit}>
+      <form className="profile-page__form" onSubmit={formik.handleSubmit} noValidate>
         <div className="profile-page__row">
           <label className="profile-page__label" htmlFor="firstName">
             First name
           </label>
-          <input
-            id="firstName"
-            name="firstName"
-            className="profile-page__input"
-            value={formik.values.firstName}
-            onChange={formik.handleChange}
-            placeholder="your first name"
-          />
+          <div className="profile-page__field">
+            <input
+              id="firstName"
+              name="firstName"
+              className="profile-page__input"
+              value={formik.values.firstName}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              placeholder="your first name"
+            />
+            {formik.touched.firstName && formik.errors.firstName && (
+              <span className="profile-page__error">{formik.errors.firstName}</span>
+            )}
+          </div>
         </div>
         <div className="profile-page__row">
           <label className="profile-page__label" htmlFor="lastName">
             Last name
           </label>
-          <input
-            id="lastName"
-            name="lastName"
-            className="profile-page__input"
-            value={formik.values.lastName}
-            onChange={formik.handleChange}
-            placeholder="your last name"
-          />
+          <div className="profile-page__field">
+            <input
+              id="lastName"
+              name="lastName"
+              className="profile-page__input"
+              value={formik.values.lastName}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              placeholder="your last name"
+            />
+            {formik.touched.lastName && formik.errors.lastName && (
+              <span className="profile-page__error">{formik.errors.lastName}</span>
+            )}
+          </div>
         </div>
         <div className="profile-page__row">
           <label className="profile-page__label" htmlFor="email">
             Email account
           </label>
-          <input
-            id="email"
-            name="email"
-            type="email"
-            className="profile-page__input"
-            value={formik.values.email}
-            onChange={formik.handleChange}
-            placeholder="yourname@gmail.com"
-          />
+          <div className="profile-page__field">
+            <input
+              id="email"
+              name="email"
+              type="email"
+              className="profile-page__input"
+              value={formik.values.email}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              placeholder="yourname@gmail.com"
+            />
+            {formik.touched.email && formik.errors.email && (
+              <span className="profile-page__error">{formik.errors.email}</span>
+            )}
+          </div>
         </div>
         <div className="profile-page__row">
           <label className="profile-page__label" htmlFor="phoneNumber">
             Mobile number
           </label>
-          <input
-            id="phoneNumber"
-            name="phoneNumber"
-            type="tel"
-            className="profile-page__input"
-            value={formik.values.phoneNumber}
-            onChange={formik.handleChange}
-            placeholder="Add number"
-          />
+          <div className="profile-page__field">
+            <PatternMaskInput
+              id="phoneNumber"
+              type="tel"
+              className="profile-page__input"
+              {...phoneMaskOptions}
+              unmask={true}
+              value={formik.values.phoneNumber.replace(/\D/g, '')}
+              onAccept={(value) => formik.setFieldValue('phoneNumber', value ? `+${value}` : '')}
+              onBlur={() => formik.setFieldTouched('phoneNumber', true)}
+              placeholder="Add number"
+            />
+            {formik.touched.phoneNumber && formik.errors.phoneNumber && (
+              <span className="profile-page__error">{formik.errors.phoneNumber}</span>
+            )}
+          </div>
         </div>
         <div className="profile-page__row">
           <label className="profile-page__label" htmlFor="username">
             Username
           </label>
-          <input
-            id="username"
-            name="username"
-            className="profile-page__input"
-            value={formik.values.username}
-            onChange={formik.handleChange}
-            placeholder="yourname@gmail.com"
-          />
+          <div className="profile-page__field">
+            <input
+              id="username"
+              name="username"
+              className="profile-page__input"
+              value={formik.values.username}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              placeholder="yourname@gmail.com"
+            />
+            {formik.touched.username && formik.errors.username && (
+              <span className="profile-page__error">{formik.errors.username}</span>
+            )}
+          </div>
         </div>
-        <PrimaryButton type="submit">Submit</PrimaryButton>
+        <PrimaryButton type="submit" disabled={formik.isSubmitting}>
+          {formik.isSubmitting ? 'Submitting...' : 'Submit'}
+        </PrimaryButton>
       </form>
     </section>
   );
