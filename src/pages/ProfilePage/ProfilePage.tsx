@@ -1,10 +1,14 @@
+import { useState } from 'react';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { Avatar } from '../../components/Avatar/Avatar';
 import { PrimaryButton } from '../../components/PrimaryButton/PrimaryButton';
-import { useAppSelector } from '../../store/hooks';
 import { useLoadCurrentUser } from '../../app/AuthBootstrap';
-import { PrimaryButton } from '../../components/PrimaryButton/PrimaryButton';
+import { useAppDispatch, useAppSelector } from '../../store/hooks';
+import { setUser } from '../../store/authSlice';
+import { updateCurrentUser } from '../../api/user';
+import { mapUserApiProfileToUser } from '../../api/mappers/userMapper';
+import { parseApiValidationError } from '../../validation/parseApiValidationError';
 import {
   emailSchema,
   phoneSchema,
@@ -17,6 +21,7 @@ import type { ReactMaskProps } from 'react-imask';
 import type { MaskedPatternOptions } from 'imask';
 import { phoneMaskOptions } from '../../components/PhoneField/phoneMask';
 import './ProfilePage.css';
+import type { UserUpdatePayload } from '../../types/user';
 
 type PatternMaskInputProps = MaskedPatternOptions &
   Omit<InputHTMLAttributes<HTMLInputElement>, 'onChange'> &
@@ -60,6 +65,9 @@ export function ProfilePage() {
   const profileError = useAppSelector((state) => state.auth.profileError);
 
   const loadCurrentUser = useLoadCurrentUser();
+  const dispatch = useAppDispatch();
+  const [generalError, setGeneralError] = useState<string | null>(null);
+  const [savedMessage, setSavedMessage] = useState<string | null>(null);
 
   const formik = useFormik<ProfileFormValues>({
     enableReinitialize: true,
@@ -71,12 +79,34 @@ export function ProfilePage() {
       username: user?.username ?? '',
     },
     validationSchema,
-    onSubmit: async (values, { setSubmitting }) => {
+    onSubmit: async (values, { setSubmitting, setFieldError }) => {
+      setGeneralError(null);
+      setSavedMessage(null);
+
       try {
-        // TODO: подключить реальный запрос на обновление профиля
-        console.log('submitting profile update', values);
-      } catch (error) {
-        console.error(error);
+        const payload: UserUpdatePayload = {
+          name: values.firstName,
+          surname: values.lastName,
+          username: values.username,
+          email: values.email,
+          ...(values.phoneNumber ? { phone_number: values.phoneNumber } : {}),
+        };
+
+        const updatedProfile = await updateCurrentUser(payload);
+        dispatch(setUser(mapUserApiProfileToUser(updatedProfile)));
+        setSavedMessage('Saved!');
+      } catch (err) {
+        const { fieldErrors, generalMessage } = parseApiValidationError(err);
+
+        for (const [field, message] of Object.entries(fieldErrors)) {
+          setFieldError(field, message);
+        }
+
+        if (generalMessage) {
+          setGeneralError(generalMessage);
+        }
+
+        console.log(err);
       } finally {
         setSubmitting(false);
       }
@@ -215,6 +245,10 @@ export function ProfilePage() {
             )}
           </div>
         </div>
+
+        {generalError && <p className="profile-page__general-error">{generalError}</p>}
+        {savedMessage && <p className="profile-page__saved-message">{savedMessage}</p>}
+
         <PrimaryButton type="submit" disabled={formik.isSubmitting}>
           {formik.isSubmitting ? 'Submitting...' : 'Submit'}
         </PrimaryButton>

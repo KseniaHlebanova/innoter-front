@@ -117,3 +117,14 @@
   font-size: 0.8125rem;
   margin-top: 0.25rem;
 }
+.profile-page__general-error {
+  color: #d92d20;
+  font-size: 0.875rem;
+  margin: 0.5rem 0 0;
+}
+
+.profile-page__saved-message {
+  color: #16a34a;
+  font-size: 0.875rem;
+  margin: 0.5rem 0 0;
+}

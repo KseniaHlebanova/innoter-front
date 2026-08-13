@@ -11,6 +11,7 @@ import { store } from '../store/store';
 import { setAuthenticated } from '../store/authSlice';
 import { logApiError, logClientError } from '../lib/sentry';
 import { logout } from '../store/authSlice';
+import { getFastApiDetail, getFastApiValidationErrors } from './apiError';
 
 export class ApiError extends Error {
   status: number;
@@ -50,20 +51,17 @@ interface FastApiValidationErrorItem {
 }
 
 function extractErrorMessage(data: unknown): string {
-  if (!data || typeof data !== 'object' || !('detail' in data)) {
-    return 'Something went wrong';
-  }
-
-  const detail = (data as { detail: unknown }).detail;
+  const detail = getFastApiDetail(data);
 
   if (typeof detail === 'string') {
     return detail;
   }
 
-  if (Array.isArray(detail)) {
-    const messages = (detail as FastApiValidationErrorItem[])
-      .map((item) => item.msg)
-      .filter(Boolean);
+  const validationErrors = getFastApiValidationErrors(data);
+
+  if (validationErrors) {
+    const messages = validationErrors.map((item) => item.msg).filter(Boolean);
+
     return messages.length > 0 ? messages.join('; ') : 'Validation error';
   }
 
@@ -116,7 +114,7 @@ async function parseResponseBody(response: Response): Promise<unknown> {
 }
 
 async function request<TResponse, TBody>(
-  method: 'GET' | 'POST',
+  method: 'GET' | 'POST' | 'PATCH',
   path: string,
   body?: TBody,
   options: RequestOptions = {},
@@ -200,4 +198,12 @@ export function apiPost<TResponse, TBody>(
 
 export function apiGet<TResponse>(path: string, options?: RequestOptions): Promise<TResponse> {
   return request<TResponse, undefined>('GET', path, undefined, options);
+}
+
+export function apiPatch<TResponse, TBody>(
+  path: string,
+  body: TBody,
+  options?: RequestOptions,
+): Promise<TResponse> {
+  return request<TResponse, TBody>('PATCH', path, body, options);
 }

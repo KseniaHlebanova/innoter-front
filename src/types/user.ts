@@ -25,3 +25,12 @@ export interface UserApiProfile {
   created_at: string;
   modified_at: string;
 }
+
+export interface UserUpdatePayload {
+  name?: string;
+  surname?: string;
+  username?: string;
+  phone_number?: string;
+  email?: string;
+  image_path?: string;
+}
