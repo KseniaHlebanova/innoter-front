@@ -1,0 +1,17 @@
+.app-shell {
+  min-height: 100vh;
+}
+.app-shell__content {
+  margin: 0 auto;
+  max-width: 72rem;
+  padding: 1rem;
+  width: 100%;
+}
+.authenticated-layout {
+  display: block;
+}
+@media (min-width: 768px) {
+  .authenticated-layout {
+    display: flex;
+  }
+}
