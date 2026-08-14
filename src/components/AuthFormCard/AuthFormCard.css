@@ -1,0 +1,25 @@
+.auth-form-card {
+  margin: 0 auto;
+  max-width: 26rem;
+  width: 100%;
+}
+.auth-form-card h1 {
+  font-size: 1.75rem;
+  line-height: 1.25;
+  margin: 0;
+}
+.auth-form-card__description {
+  color: #8390a5;
+  font-size: 0.9375rem;
+  line-height: 1.55;
+  margin: 0.75rem 0 1rem;
+}
+.auth-form-card__divider {
+  background: #edf0f4;
+  height: 1px;
+  margin-bottom: 1.5rem;
+}
+.auth-form-card__footer {
+  font-size: 0.875rem;
+  text-align: center;
+}

@@ -1,0 +1,28 @@
+.login-page__form {
+  display: grid;
+}
+.login-page__remember {
+  align-items: center;
+  color: #5e6878;
+  display: flex;
+  font-size: 0.875rem;
+  gap: 0.5rem;
+  margin: -0.25rem 0 1.25rem;
+}
+.login-page__remember input {
+  accent-color: #2f73e8;
+  height: 1rem;
+  margin: 0;
+  width: 1rem;
+}
+.login-page__signup {
+  color: #5e6878;
+  margin: 2rem 0 1.25rem;
+}
+.login-page__signup a,
+.login-page__forgot-password {
+  color: #1670e8;
+}
+.login-page__forgot-password {
+  display: block;
+}
