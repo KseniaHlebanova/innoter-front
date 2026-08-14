@@ -1,0 +1,63 @@
+.public-sidebar {
+  background: #fff;
+  border-right: 1px solid #e2e8f0;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  min-height: 100vh;
+  padding: 1rem 1.25rem 1.5rem;
+  width: 100%;
+}
+.public-sidebar__logo {
+  display: inline-flex;
+  padding: 0.5rem 0.75rem;
+}
+.public-sidebar__login-button {
+  align-items: center;
+  background: #2f73e8;
+  border-radius: 9px;
+  color: #fff;
+  display: inline-flex;
+  font-size: 1.0625rem;
+  font-weight: 700;
+  justify-content: center;
+  min-height: 3rem;
+  padding: 0.75rem 1.5rem;
+  width: 5rem;
+}
+.public-sidebar__login-button:hover {
+  background: #1d55b8;
+}
+@media (min-width: 768px) {
+  .public-sidebar {
+    width: 17.5rem;
+    min-width: 17.5rem;
+    flex-shrink: 0;
+    position: sticky;
+    top: 0;
+  }
+
+  .public-sidebar__login-button {
+    width: 60%;
+    max-width: 14.5rem;
+  }
+}
+@media (max-width: 767px) {
+  .public-sidebar {
+    align-items: center;
+    border-bottom: 1px solid #e2e8f0;
+    border-right: 0;
+    flex-direction: row;
+    justify-content: space-between;
+    min-height: auto;
+    padding: 0.75rem 1rem;
+    position: sticky;
+    top: 0;
+    z-index: 20;
+  }
+  .public-sidebar__login-button {
+    font-size: 0.9375rem;
+    min-height: 2.5rem;
+    padding: 0.5rem 1.25rem;
+  }
+}

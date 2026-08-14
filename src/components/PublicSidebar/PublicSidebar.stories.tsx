@@ -1,10 +1,10 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { MemoryRouter } from 'react-router-dom';
-import { Sidebar } from './Sidebar';
+import { PublicSidebar } from './PublicSidebar';
 
 const meta = {
-  title: 'Components/Sidebar',
-  component: Sidebar,
+  title: 'Components/PublicSidebar',
+  component: PublicSidebar,
   decorators: [
     (Story) => (
       <MemoryRouter>
@@ -12,7 +12,7 @@ const meta = {
       </MemoryRouter>
     ),
   ],
-} satisfies Meta<typeof Sidebar>;
+} satisfies Meta<typeof PublicSidebar>;
 export default meta;
 type Story = StoryObj<typeof meta>;
 export const Default: Story = {};

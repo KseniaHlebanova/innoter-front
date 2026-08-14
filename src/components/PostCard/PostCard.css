@@ -1,0 +1,112 @@
+.post-card {
+  border-bottom: 1px solid #e2e8f0;
+  display: flex;
+  gap: 0.75rem;
+  padding: 0.875rem 1rem;
+  width: 80%;
+}
+@media (max-width: 800px) {
+  .post-card {
+    width: 100%;
+  }
+}
+.post-card__body {
+  flex: 1;
+  min-width: 0;
+}
+.post-card__header {
+  align-items: flex-start;
+  display: flex;
+  gap: 0.5rem;
+  justify-content: space-between;
+}
+.post-card__meta {
+  align-items: baseline;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  min-width: 0;
+}
+.post-card__name {
+  font-weight: 700;
+}
+.post-card__username,
+.post-card__time,
+.post-card__dot {
+  color: #64748b;
+  font-size: 0.9375rem;
+}
+.post-card__menu {
+  background: transparent;
+  border: 0;
+  color: #64748b;
+  cursor: pointer;
+  font-size: 1rem;
+  line-height: 1;
+  padding: 0.125rem 0.25rem;
+}
+.post-card__text {
+  margin: 0.375rem 0 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.post-card__image {
+  border-radius: 1rem;
+  display: block;
+  margin-top: 0.75rem;
+  max-height: 20rem;
+  object-fit: cover;
+  width: 100%;
+}
+.post-card__actions {
+  display: flex;
+  margin-top: 12px;
+}
+
+.post-card__action-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #536471;
+  padding: 0;
+  font-size: 14px;
+  transition: color 0.2s ease;
+}
+
+.post-card__action-btn:hover {
+  color: #f91880;
+}
+
+.post-card__action-btn:hover .post-card__like-icon {
+  stroke: #f91880;
+  fill: rgba(249, 24, 128, 0.1);
+}
+.post-card__menu {
+  background: transparent;
+  border: 0;
+  color: #64748b;
+  cursor: pointer;
+  font-size: 1rem;
+  line-height: 1;
+  padding: 0.125rem 0.25rem;
+  transition: transform 0.2s ease;
+}
+.post-card__menu--collapsed {
+  transform: rotate(-90deg);
+}
+
+.post-card__text {
+  margin: 0.375rem 0 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.post-card__text--collapsed {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  white-space: normal;
+}

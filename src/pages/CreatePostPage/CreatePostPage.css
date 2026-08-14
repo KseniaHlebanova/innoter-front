@@ -1,0 +1,11 @@
+.create-post-page {
+  padding: 1rem;
+}
+.create-post-page__title {
+  font-size: 1.25rem;
+  margin: 0 0 0.75rem;
+}
+.create-post-page__placeholder {
+  color: #64748b;
+  margin: 0;
+}

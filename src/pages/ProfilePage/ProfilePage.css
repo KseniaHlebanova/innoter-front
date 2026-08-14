@@ -1,0 +1,22 @@
+.profile-page {
+  padding: 1rem;
+}
+.profile-page__header {
+  align-items: center;
+  border-bottom: 1px solid #e2e8f0;
+  display: flex;
+  gap: 1rem;
+  padding-bottom: 1rem;
+}
+.profile-page__name {
+  font-size: 1.25rem;
+  margin: 0;
+}
+.profile-page__username {
+  color: #64748b;
+  margin: 0.25rem 0 0;
+}
+.profile-page__placeholder {
+  color: #64748b;
+  margin: 1rem 0 0;
+}
