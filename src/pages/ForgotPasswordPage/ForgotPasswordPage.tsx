@@ -22,10 +22,10 @@ export function ForgotPasswordPage() {
     onSubmit: async (values, { setSubmitting, setFieldError }) => {
       try {
         // TODO: replace with real API call to UMS:
-        console.log('submitting', values);
+        console.info('submitting', values);
       } catch (err) {
         setFieldError('email', 'Something went wrong, please try again');
-        console.log(err);
+        console.error(err);
       } finally {
         setSubmitting(false);
       }

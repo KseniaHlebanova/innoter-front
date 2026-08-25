@@ -6,11 +6,12 @@ import { PrimaryButton } from '../../components/PrimaryButton/PrimaryButton';
 import { TextField } from '../../components/TextField/TextField';
 import './LoginPage.css';
 import { loginUser } from '../../api/auth';
-import { ApiError } from '../../api/httpClient';
 import { useNavigate } from 'react-router-dom';
 import { useAppDispatch } from '../../store/hooks';
 import { setAuthenticated } from '../../store/authSlice';
 import { saveTokens } from '../../api/tokenStorage';
+import { ApiError, NetworkError } from '../../api/httpClient';
+import { logClientError } from '../../lib/sentry';
 
 interface LoginFormValues {
   email: string;
@@ -40,7 +41,8 @@ export function LoginPage() {
       rememberMe: true,
     },
     validationSchema,
-    onSubmit: async (values, { setSubmitting, setFieldError }) => {
+    onSubmit: async (values, { setSubmitting, setStatus }) => {
+      setStatus(undefined);
       try {
         const tokens = await loginUser({
           email: values.email,
@@ -51,11 +53,19 @@ export function LoginPage() {
         navigate('/');
       } catch (err) {
         if (err instanceof ApiError) {
-          setFieldError('password', err.message);
+          if (err.status === 401 || err.status === 403) {
+            setStatus('Incorrect email or password.');
+          } else if (err.status === 429) {
+            setStatus('Too many attempts. Please wait a moment and try again.');
+          } else {
+            setStatus(err.message);
+          }
+        } else if (err instanceof NetworkError) {
+          setStatus('Unable to reach the server. Check your connection and try again.');
         } else {
-          setFieldError('password', 'Something went wrong, please try again');
+          logClientError('Unexpected error during login', err, { component: 'LoginPage' });
+          setStatus('Something went wrong, please try again.');
         }
-        console.log(err);
       } finally {
         setSubmitting(false);
       }

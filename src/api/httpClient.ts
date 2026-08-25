@@ -9,6 +9,7 @@ import {
 import { refreshTokens } from './auth';
 import { store } from '../store/store';
 import { setAuthenticated } from '../store/authSlice';
+import { logApiError, logClientError } from '../lib/sentry';
 
 export class ApiError extends Error {
   status: number;
@@ -18,6 +19,26 @@ export class ApiError extends Error {
     super(message);
     this.status = status;
     this.details = details;
+  }
+}
+
+export class NetworkError extends Error {
+  constructor(message = 'Network request failed', cause?: unknown) {
+    super(message);
+    this.name = 'NetworkError';
+    if (cause !== undefined) {
+      this.cause = cause;
+    }
+  }
+}
+
+export class ClientError extends Error {
+  constructor(message: string, cause?: unknown) {
+    super(message);
+    this.name = 'ClientError';
+    if (cause !== undefined) {
+      this.cause = cause;
+    }
   }
 }
 
@@ -75,6 +96,24 @@ function getOrCreateRefreshPromise(): Promise<string> {
   return refreshPromise;
 }
 
+function hasEmptyBody(response: Response): boolean {
+  if (response.status === 204 || response.status === 205) {
+    return true;
+  }
+  return response.headers.get('content-length') === '0';
+}
+
+async function parseResponseBody(response: Response): Promise<unknown> {
+  if (hasEmptyBody(response)) {
+    return null;
+  }
+  try {
+    return await response.json();
+  } catch {
+    throw new ApiError(response.status, 'Invalid response format from server');
+  }
+}
+
 async function request<TResponse, TBody>(
   method: 'GET' | 'POST',
   path: string,
@@ -86,17 +125,37 @@ async function request<TResponse, TBody>(
   };
 
   if (options.auth) {
-    const token = getAccessToken();
+    let token: string | null;
+    try {
+      token = getAccessToken();
+    } catch (cause) {
+      logClientError('Failed to read access token', cause, { method, path });
+      throw new ClientError('Failed to read access token', cause);
+    }
     if (token) {
       headers.Authorization = `Bearer ${token}`;
     }
   }
 
-  const response = await fetch(`${API_BASE_URL}${path}`, {
-    method,
-    headers,
-    body: body ? JSON.stringify(body) : undefined,
-  });
+  let serializedBody: string | undefined;
+  try {
+    serializedBody = body !== undefined ? JSON.stringify(body) : undefined;
+  } catch (cause) {
+    logClientError('Failed to serialize request body', cause, { method, path });
+    throw new ClientError('Failed to serialize request body', cause);
+  }
+
+  let response: Response;
+  try {
+    response = await fetch(`${API_BASE_URL}${path}`, {
+      method,
+      headers,
+      body: serializedBody,
+    });
+  } catch (cause) {
+    logApiError(`Network request failed at ${path}`, { method, path, body, status: 0 }, cause);
+    throw new NetworkError('Network request failed', cause);
+  }
 
   if (response.status === 401 && options.auth && !options.skipRetry) {
     try {
@@ -109,12 +168,24 @@ async function request<TResponse, TBody>(
     }
   }
 
-  const data = await response.json().catch(() => null);
-
   if (!response.ok) {
-    throw new ApiError(response.status, extractErrorMessage(data), data);
+    const errorData = await response.json().catch(() => null);
+    if (response.status >= 500) {
+      logApiError(
+        `API ${response.status} error at ${path}`,
+        { method, path, body, status: response.status },
+        errorData,
+      );
+      throw new ApiError(
+        response.status,
+        'Something went wrong. Please try again later.',
+        errorData,
+      );
+    }
+    throw new ApiError(response.status, extractErrorMessage(errorData), errorData);
   }
 
+  const data = await parseResponseBody(response);
   return data as TResponse;
 }
 

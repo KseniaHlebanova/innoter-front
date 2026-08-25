@@ -63,7 +63,7 @@ export function SignupPage() {
         console.log('submitting', values);
       } catch (err) {
         setFieldError('username', 'Something went wrong, please try again');
-        console.log(err);
+        console.error(err);
       } finally {
         setSubmitting(false);
       }
