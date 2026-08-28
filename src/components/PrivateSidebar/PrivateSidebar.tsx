@@ -1,8 +1,8 @@
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { Avatar } from '../Avatar/Avatar';
 import { InnoterLogo } from '../InnoterLogo/InnoterLogo';
-import { useAppDispatch, useAppSelector } from '../../store/hooks'; // useAppSelector добавлен
-import { setAuthenticated } from '../../store/authSlice';
+import { useAppDispatch, useAppSelector } from '../../store/hooks';
+import { logout } from '../../store/authSlice';
 import { clearTokens } from '../../api/tokenStorage';
 import { DEFAULT_AVATAR_URL } from '../../assets/defaultAvatar';
 import './PrivateSidebar.css';
@@ -49,7 +49,7 @@ export function PrivateSidebar() {
 
   function handleLogout() {
     clearTokens();
-    dispatch(setAuthenticated(false));
+    dispatch(logout());
     navigate('/login');
   }
 

@@ -8,7 +8,7 @@ interface InnoterLogoProps {
 export function InnoterLogo({ compact = false }: InnoterLogoProps) {
   return (
     <div className={`innoter-logo${compact ? ' innoter-logo--compact' : ''}`}>
-      <img className="innoter-logo__icon" src={innoterLogo} alt="" aria-hidden="true" />
+      <img className="innoter-logo__icon" src={innoterLogo} alt="Innoter logo" />
       {!compact}
     </div>
   );

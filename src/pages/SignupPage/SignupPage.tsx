@@ -6,12 +6,10 @@ import { PrimaryButton } from '../../components/PrimaryButton/PrimaryButton';
 import { PhoneField } from '../../components/PhoneField/PhoneField';
 import { TextField } from '../../components/TextField/TextField';
 import { signupUser, loginUser } from '../../api/auth';
-import { getCurrentUser } from '../../api/user';
-import { mapUserApiProfileToUser } from '../../api/mappers/userMapper';
 import { ApiError } from '../../api/httpClient';
 import { saveTokens } from '../../api/tokenStorage';
 import { useAppDispatch } from '../../store/hooks';
-import { setAuthenticated, setUser } from '../../store/authSlice';
+import { setAuthenticated } from '../../store/authSlice';
 import type { SignupPayload } from '../../types/auth';
 import './SignupPage.css';
 
@@ -26,6 +24,7 @@ interface SignupFormValues {
 
 const USERNAME_REGEX = /^[a-zA-Z][a-zA-Z0-9_]+$/;
 const PHONE_REGEX = /^\+?[1-9]\d{6,14}$/;
+const REMEMBER_ME_CHECKBOX_DEFAULT_VALUE = true;
 
 const validationSchema = Yup.object({
   firstName: Yup.string().trim().required('First name is required'),
@@ -68,7 +67,7 @@ export function SignupPage() {
       password: '',
     },
     validationSchema,
-    onSubmit: async (values, { setSubmitting, setFieldError }) => {
+    onSubmit: async (values, { setSubmitting, setStatus }) => {
       try {
         const signupPayload: SignupPayload = {
           name: values.firstName,
@@ -81,24 +80,31 @@ export function SignupPage() {
 
         await signupUser(signupPayload);
 
-        const tokens = await loginUser({
-          email: values.email,
-          password: values.password,
-        });
-        saveTokens(tokens, true);
-        dispatch(setAuthenticated(true));
-
-        const profile = await getCurrentUser();
-        dispatch(setUser(mapUserApiProfileToUser(profile)));
-
-        navigate('/');
+        try {
+          const tokens = await loginUser({
+            email: values.email,
+            password: values.password,
+          });
+          saveTokens(tokens, REMEMBER_ME_CHECKBOX_DEFAULT_VALUE);
+          dispatch(setAuthenticated(true));
+          navigate('/');
+        } catch (loginErr) {
+          //TODO Sentry log add
+          console.error('Auto-login after signup failed', loginErr);
+          navigate('/login', { state: { message: 'Account created, please log in.' } });
+        }
       } catch (err) {
         if (err instanceof ApiError) {
-          setFieldError('username', err.message);
+          if (err.status === 409) {
+            setStatus('An account with this email already exists.');
+          } else {
+            setStatus(err.message);
+          }
         } else {
-          setFieldError('username', 'Something went wrong, please try again');
+          //TODO Sentry log add
+          console.error('Unexpected error during signup', err);
+          setStatus('Something went wrong, please try again.');
         }
-        console.log(err);
       } finally {
         setSubmitting(false);
       }

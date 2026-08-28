@@ -5,13 +5,11 @@ import { AuthFormCard } from '../../components/AuthFormCard/AuthFormCard';
 import { PrimaryButton } from '../../components/PrimaryButton/PrimaryButton';
 import { TextField } from '../../components/TextField/TextField';
 import { loginUser } from '../../api/auth';
-import { getCurrentUser } from '../../api/user';
-import { mapUserApiProfileToUser } from '../../api/mappers/userMapper';
 import { saveTokens } from '../../api/tokenStorage';
 import { ApiError, NetworkError } from '../../api/httpClient';
 import { logClientError } from '../../lib/sentry';
 import { useAppDispatch } from '../../store/hooks';
-import { setAuthenticated, setUser } from '../../store/authSlice';
+import { setAuthenticated } from '../../store/authSlice';
 import './LoginPage.css';
 
 interface LoginFormValues {
@@ -51,9 +49,6 @@ export function LoginPage() {
         });
         saveTokens(tokens, values.rememberMe);
         dispatch(setAuthenticated(true));
-
-        const profile = await getCurrentUser();
-        dispatch(setUser(mapUserApiProfileToUser(profile)));
 
         navigate('/');
       } catch (err) {

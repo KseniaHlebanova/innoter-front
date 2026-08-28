@@ -8,6 +8,6 @@ test('shows logo and login button', () => {
       <PublicSidebar />
     </MemoryRouter>,
   );
-  expect(screen.getByText('Inotter')).toBeInTheDocument();
+  expect(screen.getByAltText('Innoter logo')).toBeInTheDocument();
   expect(screen.getByRole('link', { name: 'Login' })).toHaveAttribute('href', '/login');
 });

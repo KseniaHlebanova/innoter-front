@@ -9,6 +9,6 @@ export function isModerator(user: User | null): boolean {
   return user?.role === Role.MODERATOR;
 }
 
-export function canAccessAdminPanel(user: User | null): boolean {
+export function canAccessAdminModeratorPanel(user: User | null): boolean {
   return isAdmin(user) || isModerator(user);
 }
