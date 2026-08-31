@@ -1,12 +1,12 @@
 import type { Post } from '../../../types/post';
-import { Role } from '../../../types/role';
+import { RoleEnum } from '../../../api/generated/schema';
 
 const annie = {
   id: 'user-annie',
   displayName: 'Annie',
   username: 'annie',
   avatarUrl: 'https://i.pravatar.cc/150?u=annie',
-  role: Role.USER,
+  role: RoleEnum.USER,
 };
 
 const jorge = {
@@ -14,7 +14,7 @@ const jorge = {
   displayName: 'Jorge Mckinney',
   username: 'traviswade',
   avatarUrl: 'https://i.pravatar.cc/150?u=jorge',
-  role: Role.USER,
+  role: RoleEnum.USER,
 };
 
 const serenity = {
@@ -22,7 +22,7 @@ const serenity = {
   displayName: 'Serenity Jones',
   username: 'crystalrobinson',
   avatarUrl: 'https://i.pravatar.cc/150?u=serenity',
-  role: Role.USER,
+  role: RoleEnum.USER,
 };
 
 const marcus = {
@@ -30,7 +30,7 @@ const marcus = {
   displayName: 'Marcus Lee',
   username: 'marcuslee',
   avatarUrl: 'https://i.pravatar.cc/150?u=marcus',
-  role: Role.USER,
+  role: RoleEnum.USER,
 };
 
 const elena = {
@@ -38,7 +38,7 @@ const elena = {
   displayName: 'Elena Petrova',
   username: 'elena_p',
   avatarUrl: 'https://i.pravatar.cc/150?u=elena',
-  role: Role.USER,
+  role: RoleEnum.USER,
 };
 
 export const subscriptionFeedPosts: Post[] = [

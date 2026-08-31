@@ -1,5 +1,3 @@
-export enum Role {
-  USER = 1,
-  ADMIN = 2,
-  MODERATOR = 3,
-}
+import type { components } from '../api/generated/schema';
+
+export type Role = components['schemas']['RoleEnum'];

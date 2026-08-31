@@ -1,9 +1,11 @@
+import type { Role } from './role';
+
 export interface User {
   id: string;
   displayName: string;
   username: string;
   avatarUrl: string;
-  role: number;
+  role: Role;
 }
 
 export interface UserApiProfile {
@@ -15,7 +17,7 @@ export interface UserApiProfile {
   email: string;
   image_path: string | null;
   group_id: number | null;
-  role: number;
+  role: Role;
   created_at: string;
   modified_at: string;
 }
