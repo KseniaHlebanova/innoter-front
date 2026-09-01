@@ -22,6 +22,7 @@ import type { MaskedPatternOptions } from 'imask';
 import { phoneMaskOptions } from '../../components/PhoneField/phoneMask';
 import './ProfilePage.css';
 import type { UserUpdatePayload } from '../../types/user';
+import { ApiError } from '../../api/httpClient';
 
 type PatternMaskInputProps = MaskedPatternOptions &
   Omit<InputHTMLAttributes<HTMLInputElement>, 'onChange'> &
@@ -66,11 +67,11 @@ export function ProfilePage() {
 
   const loadCurrentUser = useLoadCurrentUser();
   const dispatch = useAppDispatch();
-  const [generalError, setGeneralError] = useState<string | null>(null);
   const [savedMessage, setSavedMessage] = useState<string | null>(null);
 
   const formik = useFormik<ProfileFormValues>({
     enableReinitialize: true,
+    initialStatus: undefined as string | undefined,
     initialValues: {
       firstName: user?.name ?? '',
       lastName: user?.surname ?? '',
@@ -79,8 +80,8 @@ export function ProfilePage() {
       username: user?.username ?? '',
     },
     validationSchema,
-    onSubmit: async (values, { setSubmitting, setFieldError }) => {
-      setGeneralError(null);
+    onSubmit: async (values, { setSubmitting, setStatus, setFieldError }) => {
+      setStatus(undefined);
       setSavedMessage(null);
 
       try {
@@ -96,17 +97,25 @@ export function ProfilePage() {
         dispatch(setUser(mapUserApiProfileToUser(updatedProfile)));
         setSavedMessage('Saved!');
       } catch (err) {
-        const { fieldErrors, generalMessage } = parseApiValidationError(err);
+        if (err instanceof ApiError) {
+          if (err.status === 409) {
+            setStatus('Email, phone number or username already exists! Please, try again.');
+          } else {
+            const { fieldErrors, generalMessage } = parseApiValidationError(err);
 
-        for (const [field, message] of Object.entries(fieldErrors)) {
-          setFieldError(field, message);
+            for (const [field, message] of Object.entries(fieldErrors)) {
+              setFieldError(field, message);
+            }
+
+            if (generalMessage) {
+              setStatus(generalMessage);
+            }
+          }
+        } else {
+          //TODO Sentry log add
+          console.error('Unexpected error updating profile', err);
+          setStatus('Something went wrong, please try again.');
         }
-
-        if (generalMessage) {
-          setGeneralError(generalMessage);
-        }
-
-        console.log(err);
       } finally {
         setSubmitting(false);
       }
@@ -238,7 +247,7 @@ export function ProfilePage() {
               value={formik.values.username}
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
-              placeholder="yourname@gmail.com"
+              placeholder="your_username67"
             />
             {formik.touched.username && formik.errors.username && (
               <span className="profile-page__error">{formik.errors.username}</span>
@@ -246,7 +255,7 @@ export function ProfilePage() {
           </div>
         </div>
 
-        {generalError && <p className="profile-page__general-error">{generalError}</p>}
+        {formik.status && <p className="profile-page__general-error">{formik.status}</p>}
         {savedMessage && <p className="profile-page__saved-message">{savedMessage}</p>}
 
         <PrimaryButton type="submit" disabled={formik.isSubmitting}>
