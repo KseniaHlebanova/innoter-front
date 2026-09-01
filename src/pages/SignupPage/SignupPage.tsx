@@ -185,6 +185,7 @@ export function SignupPage() {
           onBlur={formik.handleBlur}
           error={formik.touched.password ? formik.errors.password : undefined}
         />
+        {formik.status && <p className="signup-page__general-error">{formik.status}</p>}
         <PrimaryButton type="submit" disabled={formik.isSubmitting}>
           {formik.isSubmitting ? 'Submitting...' : 'Continue'}
         </PrimaryButton>
