@@ -19,7 +19,7 @@ export interface UserApiProfile {
   username: string;
   phone_number: string | null;
   email: string;
-  image_path: string | null;
+  image_s3_path: string | null;
   group_id: number | null;
   role: Role;
   created_at: string;
@@ -32,5 +32,5 @@ export interface UserUpdatePayload {
   username?: string;
   phone_number?: string;
   email?: string;
-  image_path?: string;
+  image_s3_path?: string;
 }

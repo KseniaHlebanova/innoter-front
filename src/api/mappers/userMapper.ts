@@ -6,7 +6,7 @@ export function mapUserApiProfileToUser(profile: UserApiProfile): User {
     id: profile.id,
     displayName: `${profile.name} ${profile.surname}`.trim(),
     username: profile.username,
-    avatarUrl: DEFAULT_AVATAR_URL,
+    avatarUrl: profile.image_s3_path ? profile.image_s3_path : DEFAULT_AVATAR_URL,
     role: profile.role,
     name: profile.name,
     surname: profile.surname,

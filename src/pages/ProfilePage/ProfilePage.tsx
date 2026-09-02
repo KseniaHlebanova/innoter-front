@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import type { ChangeEvent } from 'react';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { Avatar } from '../../components/Avatar/Avatar';
@@ -7,6 +8,7 @@ import { useLoadCurrentUser } from '../../app/AuthBootstrap';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { setUser } from '../../store/authSlice';
 import { updateCurrentUser } from '../../api/user';
+import { getAvatarUploadUrl, uploadAvatarToS3 } from '../../api/avatar';
 import { mapUserApiProfileToUser } from '../../api/mappers/userMapper';
 import { parseApiValidationError } from '../../validation/parseApiValidationError';
 import {
@@ -30,12 +32,19 @@ type PatternMaskInputProps = MaskedPatternOptions &
 
 const PatternMaskInput = IMaskInput as ComponentType<PatternMaskInputProps>;
 
+const ALLOWED_AVATAR_EXTENSIONS = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+
 interface ProfileFormValues {
   firstName: string;
   lastName: string;
   email: string;
   phoneNumber: string;
   username: string;
+}
+
+interface AvatarSelection {
+  file: File;
+  previewUrl: string;
 }
 
 const validationSchema = Yup.object({
@@ -69,6 +78,51 @@ export function ProfilePage() {
   const dispatch = useAppDispatch();
   const [savedMessage, setSavedMessage] = useState<string | null>(null);
 
+  const [avatarSelection, setAvatarSelection] = useState<AvatarSelection | null>(null);
+  const [uploadedImagePath, setUploadedImagePath] = useState<string | null>(null);
+  const [avatarError, setAvatarError] = useState<string | null>(null);
+  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
+
+  const avatarPreviewUrlRef = useRef<string | null>(null);
+  useEffect(() => {
+    avatarPreviewUrlRef.current = avatarSelection?.previewUrl ?? null;
+  }, [avatarSelection]);
+  useEffect(() => {
+    return () => {
+      if (avatarPreviewUrlRef.current) {
+        URL.revokeObjectURL(avatarPreviewUrlRef.current);
+      }
+    };
+  }, []);
+
+  const hasAvatarChange = avatarSelection !== null || uploadedImagePath !== null;
+
+  function handleAvatarFileChange(event: ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    event.target.value = '';
+    if (!file) return;
+
+    const extension = file.name.split('.').pop()?.toLowerCase();
+    if (!extension || !ALLOWED_AVATAR_EXTENSIONS.includes(extension)) {
+      setAvatarError(`Unsupported file type. Allowed: ${ALLOWED_AVATAR_EXTENSIONS.join(', ')}`);
+      return;
+    }
+
+    setAvatarError(null);
+    setUploadedImagePath(null);
+    setAvatarSelection((prev) => {
+      if (prev) URL.revokeObjectURL(prev.previewUrl);
+      return { file, previewUrl: URL.createObjectURL(file) };
+    });
+  }
+
+  function handleCancelAvatar() {
+    if (avatarSelection) URL.revokeObjectURL(avatarSelection.previewUrl);
+    setAvatarSelection(null);
+    setUploadedImagePath(null);
+    setAvatarError(null);
+  }
+
   const formik = useFormik<ProfileFormValues>({
     enableReinitialize: true,
     initialStatus: undefined as string | undefined,
@@ -83,6 +137,28 @@ export function ProfilePage() {
     onSubmit: async (values, { setSubmitting, setStatus, setFieldError }) => {
       setStatus(undefined);
       setSavedMessage(null);
+      setAvatarError(null);
+
+      let imagePath: string | undefined = uploadedImagePath ?? undefined;
+
+      if (avatarSelection && !uploadedImagePath) {
+        setIsUploadingAvatar(true);
+        try {
+          const extension = avatarSelection.file.name.split('.').pop() ?? '';
+          const { url, fields, generated_filename } = await getAvatarUploadUrl(extension);
+          await uploadAvatarToS3(url, fields, avatarSelection.file);
+          setUploadedImagePath(generated_filename);
+          imagePath = generated_filename;
+        } catch (err) {
+          //TODO Sentry log add (logClientError)
+          console.error('Avatar upload failed', err);
+          setAvatarError('Failed to upload avatar. Please try again.');
+          setIsUploadingAvatar(false);
+          setSubmitting(false);
+          return;
+        }
+        setIsUploadingAvatar(false);
+      }
 
       try {
         const payload: UserUpdatePayload = {
@@ -91,11 +167,16 @@ export function ProfilePage() {
           username: values.username,
           email: values.email,
           ...(values.phoneNumber ? { phone_number: values.phoneNumber } : {}),
+          ...(imagePath ? { image_s3_path: imagePath } : {}),
         };
 
         const updatedProfile = await updateCurrentUser(payload);
         dispatch(setUser(mapUserApiProfileToUser(updatedProfile)));
         setSavedMessage('Saved!');
+
+        if (avatarSelection) URL.revokeObjectURL(avatarSelection.previewUrl);
+        setAvatarSelection(null);
+        setUploadedImagePath(null);
       } catch (err) {
         if (err instanceof ApiError) {
           if (err.status === 409) {
@@ -141,20 +222,44 @@ export function ProfilePage() {
     );
   }
 
+  const isDirty = formik.dirty || hasAvatarChange;
+
   return (
     <section className="profile-page">
       <header className="profile-page__header">
         <div className="profile-page__avatar-wrap">
-          <Avatar src={user.avatarUrl} alt={`${user.displayName} avatar`} size="lg" />
-          <button type="button" className="profile-page__avatar-edit" aria-label="Change avatar">
+          <Avatar
+            src={avatarSelection?.previewUrl ?? user.avatarUrl}
+            alt={`${user.displayName} avatar`}
+            size="lg"
+          />
+          <label className="profile-page__avatar-edit" aria-label="Change avatar">
             <EditIcon />
-          </button>
+            <input
+              type="file"
+              accept="image/jpeg,image/png,image/gif,image/webp"
+              className="profile-page__avatar-input"
+              onChange={handleAvatarFileChange}
+              disabled={formik.isSubmitting || isUploadingAvatar}
+            />
+          </label>
+          {hasAvatarChange && (
+            <button
+              type="button"
+              className="profile-page__avatar-cancel"
+              onClick={handleCancelAvatar}
+              disabled={formik.isSubmitting || isUploadingAvatar}
+            >
+              Cancel
+            </button>
+          )}
         </div>
         <div>
           <h1 className="profile-page__name">{user.displayName || 'Your name'}</h1>
           <p className="profile-page__email">{user.email}</p>
         </div>
       </header>
+      {avatarError && <p className="profile-page__error">{avatarError}</p>}
       <form className="profile-page__form" onSubmit={formik.handleSubmit} noValidate>
         <div className="profile-page__row">
           <label className="profile-page__label" htmlFor="firstName">
@@ -258,8 +363,11 @@ export function ProfilePage() {
         {formik.status && <p className="profile-page__general-error">{formik.status}</p>}
         {savedMessage && <p className="profile-page__saved-message">{savedMessage}</p>}
 
-        <PrimaryButton type="submit" disabled={formik.isSubmitting}>
-          {formik.isSubmitting ? 'Submitting...' : 'Submit'}
+        <PrimaryButton
+          type="submit"
+          disabled={formik.isSubmitting || isUploadingAvatar || !isDirty}
+        >
+          {formik.isSubmitting || isUploadingAvatar ? 'Submitting...' : 'Submit'}
         </PrimaryButton>
       </form>
     </section>
