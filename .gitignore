@@ -32,6 +32,3 @@ Thumbs.db
 # Local AI assistant metadata
 .aiassistant/
 AGENTS.md
-
-# project env files
-env.js

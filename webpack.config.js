@@ -21,15 +21,6 @@ module.exports = {
       { test: /\.png$/, type: 'asset/resource' },
     ],
   },
-  plugins: [
-    new HtmlWebpackPlugin({ template: './src/index.html' }),
-  ],
-  devServer: {
-    static: {
-      directory: path.join(__dirname, 'public'),
-    },
-    historyApiFallback: true,
-    port: 3000,
-    host: '0.0.0.0',
-  },
+  plugins: [new HtmlWebpackPlugin({ template: './src/index.html' })],
+  devServer: { historyApiFallback: true, port: 3000 },
 };

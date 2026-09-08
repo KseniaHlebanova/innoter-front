@@ -3,8 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "prestart": "node scripts/generate-env.js",
-    "start": "webpack serve --mode development --host 0.0.0.0",
+    "start": "webpack serve --mode development",
     "build": "webpack --mode production",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
@@ -16,7 +15,6 @@
   },
   "dependencies": {
     "@reduxjs/toolkit": "^2.11.2",
-    "@sentry/react": "^10.71.0",
     "formik": "^2.4.9",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
@@ -40,7 +38,6 @@
     "@types/react-dom": "^19.2.3",
     "copy-webpack-plugin": "^13.0.1",
     "css-loader": "^7.1.2",
-    "dotenv": "^17.4.2",
     "eslint": "^9.39.5",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-react": "^7.37.5",
