@@ -5,6 +5,13 @@ import { AuthFormCard } from '../../components/AuthFormCard/AuthFormCard';
 import { PrimaryButton } from '../../components/PrimaryButton/PrimaryButton';
 import { TextField } from '../../components/TextField/TextField';
 import './LoginPage.css';
+import { loginUser } from '../../api/auth';
+import { useNavigate } from 'react-router-dom';
+import { useAppDispatch } from '../../store/hooks';
+import { setAuthenticated } from '../../store/authSlice';
+import { saveTokens } from '../../api/tokenStorage';
+import { ApiError, NetworkError } from '../../api/httpClient';
+import { logClientError } from '../../lib/sentry';
 
 interface LoginFormValues {
   email: string;
@@ -24,6 +31,9 @@ const validationSchema = Yup.object({
 });
 
 export function LoginPage() {
+  const navigate = useNavigate();
+  const dispatch = useAppDispatch();
+
   const formik = useFormik<LoginFormValues>({
     initialValues: {
       email: '',
@@ -31,13 +41,31 @@ export function LoginPage() {
       rememberMe: true,
     },
     validationSchema,
-    onSubmit: async (values, { setSubmitting, setFieldError }) => {
+    onSubmit: async (values, { setSubmitting, setStatus }) => {
+      setStatus(undefined);
       try {
-        // TODO: replace with real API call to UMS:
-        console.log('submitting', values);
+        const tokens = await loginUser({
+          email: values.email,
+          password: values.password,
+        });
+        saveTokens(tokens, values.rememberMe);
+        dispatch(setAuthenticated(true));
+        navigate('/');
       } catch (err) {
-        setFieldError('password', 'Invalid email or password');
-        console.log(err);
+        if (err instanceof ApiError) {
+          if (err.status === 401 || err.status === 403) {
+            setStatus('Incorrect email or password.');
+          } else if (err.status === 429) {
+            setStatus('Too many attempts. Please wait a moment and try again.');
+          } else {
+            setStatus(err.message);
+          }
+        } else if (err instanceof NetworkError) {
+          setStatus('Unable to reach the server. Check your connection and try again.');
+        } else {
+          logClientError('Unexpected error during login', err, { component: 'LoginPage' });
+          setStatus('Something went wrong, please try again.');
+        }
       } finally {
         setSubmitting(false);
       }

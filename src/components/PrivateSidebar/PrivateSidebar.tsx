@@ -1,7 +1,10 @@
-import { Link, NavLink } from 'react-router-dom';
+import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { Avatar } from '../Avatar/Avatar';
 import { InnoterLogo } from '../InnoterLogo/InnoterLogo';
 import { mockCurrentUser } from '../../features/feed/data/mockCurrentUser';
+import { useAppDispatch } from '../../store/hooks';
+import { setAuthenticated } from '../../store/authSlice';
+import { clearTokens } from '../../api/tokenStorage';
 import './PrivateSidebar.css';
 
 function HomeIcon() {
@@ -18,7 +21,6 @@ function ExploreIcon() {
       <g stroke="currentColor" strokeWidth="8" strokeLinecap="round">
         <line x1="35" y1="15" x2="25" y2="85"></line>
         <line x1="65" y1="15" x2="55" y2="85"></line>
-
         <line x1="15" y1="35" x2="85" y2="35"></line>
         <line x1="10" y1="65" x2="80" y2="65"></line>
       </g>
@@ -26,13 +28,35 @@ function ExploreIcon() {
   );
 }
 
+function LogoutIcon() {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none">
+      <path
+        d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
 export function PrivateSidebar() {
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+
+  function handleLogout() {
+    clearTokens();
+    dispatch(setAuthenticated(false));
+    navigate('/login');
+  }
+
   return (
     <aside className="private-sidebar" aria-label="Main navigation">
       <Link className="private-sidebar__logo" to="/subscriptions">
         <InnoterLogo />
       </Link>
-
       <nav className="private-sidebar__nav">
         <NavLink
           className={({ isActive }) =>
@@ -80,8 +104,15 @@ export function PrivateSidebar() {
           </span>
           <span>Post</span>
         </NavLink>
+        <button
+          type="button"
+          className="private-sidebar__link private-sidebar__logout"
+          onClick={handleLogout}
+        >
+          <LogoutIcon />
+          <span>Log out</span>
+        </button>
       </nav>
-
       <Link className="private-sidebar__post-button" to="/posts/new">
         Post
       </Link>
