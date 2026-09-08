@@ -96,7 +96,7 @@ export function ProfilePage() {
   }, []);
 
   const hasAvatarChange = avatarSelection !== null || uploadedImagePath !== null;
-
+  const avatarUrl = useAppSelector((state) => state.auth.avatarUrl);
   function handleAvatarFileChange(event: ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
     event.target.value = '';
@@ -229,7 +229,7 @@ export function ProfilePage() {
       <header className="profile-page__header">
         <div className="profile-page__avatar-wrap">
           <Avatar
-            src={avatarSelection?.previewUrl ?? user.avatarUrl}
+            src={avatarSelection?.previewUrl ?? avatarUrl}
             alt={`${user.displayName} avatar`}
             size="lg"
           />

@@ -1,9 +1,10 @@
 import { useCallback, useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
-import { setUser, setProfileLoading, setProfileError } from '../store/authSlice';
+import { setUser, setProfileLoading, setProfileError, setAvatar} from '../store/authSlice';
 import { getCurrentUser } from '../api/user';
 import { mapUserApiProfileToUser } from '../api/mappers/userMapper';
 import { logClientError } from '../lib/sentry';
+import { useAvatarImage } from '../hooks/userAvatarImage';
 
 export function useLoadCurrentUser() {
   const dispatch = useAppDispatch();
@@ -40,6 +41,12 @@ export function AuthBootstrap() {
 
     void loadCurrentUser();
   }, [isAuthenticated, user, loadCurrentUser]);
+
+  const { avatarUrl, status } = useAvatarImage(user?.id ?? null, user?.imageS3Path ?? null);
+
+  useEffect(() => {
+    dispatch(setAvatar({ url: avatarUrl, status }));
+  }, [avatarUrl, status, dispatch]);
 
   return null;
 }

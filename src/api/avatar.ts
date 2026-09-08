@@ -1,5 +1,5 @@
-import { apiPost } from './httpClient';
-import type { AvatarUploadResponse } from '../types/avatar';
+import { apiGet, apiPost } from './httpClient';
+import type { AvatarUploadResponse, AvatarViewResponse } from '../types/avatar';
 
 export function getAvatarUploadUrl(fileExtension: string): Promise<AvatarUploadResponse> {
   return apiPost<AvatarUploadResponse, undefined>(
@@ -7,6 +7,10 @@ export function getAvatarUploadUrl(fileExtension: string): Promise<AvatarUploadR
     undefined,
     { auth: true },
   );
+}
+
+export function getAvatarViewUrl(): Promise<AvatarViewResponse> {
+  return apiGet<AvatarViewResponse>('/user/avatar', { auth: true });
 }
 
 export async function uploadAvatarToS3(

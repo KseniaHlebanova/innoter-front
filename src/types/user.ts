@@ -4,12 +4,16 @@ export interface User {
   id: string;
   displayName: string;
   username: string;
-  avatarUrl: string;
   role: Role;
+  imageS3Path: string | null;
   name: string;
   surname: string;
   email: string;
   phoneNumber: string | null;
+}
+
+export interface MockUser extends User {
+  avatarUrl: string;
 }
 
 export interface UserApiProfile {
