@@ -3,6 +3,7 @@ import { useAppDispatch, useAppSelector } from '../store/hooks';
 import { setUser, setProfileLoading, setProfileError } from '../store/authSlice';
 import { getCurrentUser } from '../api/user';
 import { mapUserApiProfileToUser } from '../api/mappers/userMapper';
+import { logClientError } from '../lib/sentry';
 
 export function useLoadCurrentUser() {
   const dispatch = useAppDispatch();
@@ -15,9 +16,10 @@ export function useLoadCurrentUser() {
 
       dispatch(setUser(mapUserApiProfileToUser(profile)));
     } catch (error) {
-      // TODO: swap for Sentry (logClientError) once Sentry is wired up
-      console.error('Failed to load current user profile', error);
-
+      logClientError('Failed to load current user profile', error, {
+        source: 'useLoadCurrentUser',
+        action: 'loadCurrentUser',
+      });
       dispatch(setProfileError('Could not load your profile. Please try again.'));
     }
   }, [dispatch]);

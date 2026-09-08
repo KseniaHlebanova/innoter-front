@@ -12,6 +12,7 @@ import { useAppDispatch } from '../../store/hooks';
 import { setAuthenticated } from '../../store/authSlice';
 import type { SignupPayload } from '../../types/auth';
 import './SignupPage.css';
+import { logClientError } from '../../lib/sentry';
 
 interface SignupFormValues {
   firstName: string;
@@ -89,8 +90,10 @@ export function SignupPage() {
           dispatch(setAuthenticated(true));
           navigate('/');
         } catch (loginErr) {
-          //TODO Sentry log add
-          console.error('Auto-login after signup failed', loginErr);
+          logClientError('Auto-login after signup failed', loginErr, {
+            component: 'SignupPage',
+            action: 'autoLoginAfterSignup',
+          });
           navigate('/login', { state: { message: 'Account created, please log in.' } });
         }
       } catch (err) {
@@ -101,8 +104,9 @@ export function SignupPage() {
             setStatus(err.message);
           }
         } else {
-          //TODO Sentry log add
-          console.error('Unexpected error during signup', err);
+          logClientError('Unexpected error during signup', err, {
+            component: 'SignupPage',
+          });
           setStatus('Something went wrong, please try again.');
         }
       } finally {

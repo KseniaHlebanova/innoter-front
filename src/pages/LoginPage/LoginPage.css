@@ -26,3 +26,8 @@
 .login-page__forgot-password {
   display: block;
 }
+.login-page__general-error {
+  color: #d92d20;
+  font-size: 0.875rem;
+  margin: 0.5rem 0 1rem 0;
+}
