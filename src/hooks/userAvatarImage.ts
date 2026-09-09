@@ -6,6 +6,7 @@ import {
   putCachedAvatarBlob,
 } from '../utils/avatarCache';
 import { DEFAULT_AVATAR_URL } from '../assets/defaultAvatar';
+import { logClientError } from '../lib/sentry';
 
 type AvatarStatus = 'idle' | 'loading' | 'ready' | 'error';
 
@@ -101,8 +102,9 @@ export function useAvatarImage(
       } catch (err) {
         if (cancelled) return;
 
-        //TODO Sentry log add (logClientError)
-        console.error('Failed to load avatar', err);
+        logClientError('Failed to load avatar', err, {
+          source: 'useAvatarImage',
+        });
 
         revokePrevious();
         setAvatarUrl(DEFAULT_AVATAR_URL);

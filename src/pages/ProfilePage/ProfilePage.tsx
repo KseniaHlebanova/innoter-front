@@ -25,6 +25,7 @@ import { phoneMaskOptions } from '../../components/PhoneField/phoneMask';
 import './ProfilePage.css';
 import type { UserUpdatePayload } from '../../types/user';
 import { ApiError } from '../../api/httpClient';
+import { logClientError } from '../../lib/sentry';
 
 type PatternMaskInputProps = MaskedPatternOptions &
   Omit<InputHTMLAttributes<HTMLInputElement>, 'onChange'> &
@@ -150,8 +151,10 @@ export function ProfilePage() {
           setUploadedImagePath(generated_filename);
           imagePath = generated_filename;
         } catch (err) {
-          //TODO Sentry log add (logClientError)
-          console.error('Avatar upload failed', err);
+          logClientError('Avatar upload failed', err, {
+            source: 'ProfilePage',
+            action: 'imageUpload',
+          });
           setAvatarError('Failed to upload avatar. Please try again.');
           setIsUploadingAvatar(false);
           setSubmitting(false);
@@ -193,8 +196,10 @@ export function ProfilePage() {
             }
           }
         } else {
-          //TODO Sentry log add
-          console.error('Unexpected error updating profile', err);
+          logClientError('Unexpected error updating profile', err, {
+            source: 'ProfilePage',
+            action: 'updateProfile',
+          });
           setStatus('Something went wrong, please try again.');
         }
       } finally {

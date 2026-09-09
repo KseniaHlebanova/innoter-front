@@ -1,6 +1,6 @@
 import { useCallback, useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
-import { setUser, setProfileLoading, setProfileError, setAvatar} from '../store/authSlice';
+import { setUser, setProfileLoading, setProfileError, setAvatar } from '../store/authSlice';
 import { getCurrentUser } from '../api/user';
 import { mapUserApiProfileToUser } from '../api/mappers/userMapper';
 import { logClientError } from '../lib/sentry';
@@ -31,7 +31,7 @@ export function useLoadCurrentUser() {
 export function AuthBootstrap() {
   const isAuthenticated = useAppSelector((state) => state.auth.isAuthenticated);
   const user = useAppSelector((state) => state.auth.user);
-
+  const dispatch = useAppDispatch();
   const loadCurrentUser = useLoadCurrentUser();
 
   useEffect(() => {

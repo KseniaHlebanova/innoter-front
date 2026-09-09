@@ -2,6 +2,8 @@ import type { Preview } from '@storybook/react';
 import { Provider } from 'react-redux';
 import { configureStore } from '@reduxjs/toolkit';
 import { authReducer } from '../src/store/authSlice';
+import { DEFAULT_AVATAR_URL } from '../src/assets/defaultAvatar';
+import type { AvatarStatus } from '../src/store/authSlice';
 import '../src/app/styles.css';
 
 const preview: Preview = {
@@ -18,6 +20,8 @@ const preview: Preview = {
         user: null,
         profileStatus: 'idle' as const,
         profileError: null,
+        avatarUrl: DEFAULT_AVATAR_URL,
+        avatarStatus: 'idle' as AvatarStatus,
       };
 
       const store = configureStore({

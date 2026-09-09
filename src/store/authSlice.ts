@@ -3,7 +3,7 @@ import { getAccessToken } from '../api/tokenStorage';
 import { DEFAULT_AVATAR_URL } from '../assets/defaultAvatar';
 import type { User } from '../types/user';
 
-type AvatarStatus = 'idle' | 'loading' | 'ready' | 'error';
+export type AvatarStatus = 'idle' | 'loading' | 'ready' | 'error';
 
 export interface AuthState {
   isAuthenticated: boolean;
