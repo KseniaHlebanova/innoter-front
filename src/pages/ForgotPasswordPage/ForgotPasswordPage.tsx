@@ -1,6 +1,7 @@
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { AuthFormCard } from '../../components/AuthFormCard/AuthFormCard';
+import { emailSchema } from '../../validation/fieldSchemas';
 import { PrimaryButton } from '../../components/PrimaryButton/PrimaryButton';
 import { TextField } from '../../components/TextField/TextField';
 import './ForgotPasswordPage.css';
@@ -10,7 +11,7 @@ interface ForgotPasswordFormValues {
 }
 
 const validationSchema = Yup.object({
-  email: Yup.string().trim().email('Enter a valid email address').required('Email is required'),
+  email: emailSchema,
 });
 
 export function ForgotPasswordPage() {

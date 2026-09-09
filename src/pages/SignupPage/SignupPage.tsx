@@ -9,7 +9,14 @@ import { signupUser, loginUser } from '../../api/auth';
 import { ApiError } from '../../api/httpClient';
 import { saveTokens } from '../../api/tokenStorage';
 import { useAppDispatch } from '../../store/hooks';
-import { setAuthenticated } from '../../store/authSlice';
+import { setAuthenticated, setUser } from '../../store/authSlice';
+import {
+  emailSchema,
+  phoneSchema,
+  requiredTextSchema,
+  usernameSchema,
+  passwordSchema,
+} from '../../validation/fieldSchemas';
 import type { SignupPayload } from '../../types/auth';
 import './SignupPage.css';
 import { logClientError } from '../../lib/sentry';
@@ -28,30 +35,12 @@ const PHONE_REGEX = /^\+?[1-9]\d{6,14}$/;
 const REMEMBER_ME_CHECKBOX_DEFAULT_VALUE = true;
 
 const validationSchema = Yup.object({
-  firstName: Yup.string().trim().required('First name is required'),
-  lastName: Yup.string().trim().required('Last name is required'),
-  email: Yup.string().trim().email('Enter a valid email address').required('Email is required'),
-  phoneNumber: Yup.string()
-    .trim()
-    .min(7, 'Phone number must be at least 7 characters')
-    .max(15, 'Phone number must be at most 15 characters')
-    .matches(PHONE_REGEX, 'Enter a valid phone number')
-    .notRequired(),
-  username: Yup.string()
-    .trim()
-    .min(3, 'Username must be at least 3 characters')
-    .max(30, 'Username must be at most 30 characters')
-    .matches(
-      USERNAME_REGEX,
-      'Username must start with a letter and contain only letters, numbers, or underscores',
-    )
-    .required('Username is required'),
-  password: Yup.string()
-    .required('Password is required')
-    .min(8, 'Password must be at least 8 characters')
-    .matches(/[A-Z]/, 'Password must contain at least one uppercase letter')
-    .matches(/[a-z]/, 'Password must contain at least one lowercase letter')
-    .matches(/\d/, 'Password must contain at least one number'),
+  firstName: requiredTextSchema('First name'),
+  lastName: requiredTextSchema('Last name'),
+  email: emailSchema,
+  phoneNumber: phoneSchema,
+  username: usernameSchema,
+  password: passwordSchema,
 });
 
 export function SignupPage() {

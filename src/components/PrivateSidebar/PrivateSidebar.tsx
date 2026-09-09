@@ -4,7 +4,6 @@ import { InnoterLogo } from '../InnoterLogo/InnoterLogo';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { logout } from '../../store/authSlice';
 import { clearTokens } from '../../api/tokenStorage';
-import { DEFAULT_AVATAR_URL } from '../../assets/defaultAvatar';
 import './PrivateSidebar.css';
 
 function HomeIcon() {
@@ -45,8 +44,8 @@ function LogoutIcon() {
 export function PrivateSidebar() {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const user = useAppSelector((state) => state.auth.user); // ДОБАВЛЕНО
-
+  const user = useAppSelector((state) => state.auth.user);
+  const avatarUrl = useAppSelector((state) => state.auth.avatarUrl);
   function handleLogout() {
     clearTokens();
     dispatch(logout());
@@ -86,7 +85,7 @@ export function PrivateSidebar() {
           to="/profile"
         >
           <Avatar
-            src={user?.avatarUrl ?? DEFAULT_AVATAR_URL}
+            src={avatarUrl}
             alt={user ? `${user.displayName} avatar` : 'User avatar'}
             size="sm"
           />

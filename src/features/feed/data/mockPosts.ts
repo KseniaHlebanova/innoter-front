@@ -5,40 +5,65 @@ const annie = {
   id: 'user-annie',
   displayName: 'Annie',
   username: 'annie',
+  imageS3Path: null,
   avatarUrl: 'https://i.pravatar.cc/150?u=annie',
   role: RoleEnum.USER,
+  name: 'Annie',
+  surname: 'Muernova',
+  email: 'annie@gmail.com',
+  phoneNumber: '+375256994957',
 };
 
 const jorge = {
   id: 'user-jorge',
   displayName: 'Jorge Mckinney',
   username: 'traviswade',
+  imageS3Path: null,
   avatarUrl: 'https://i.pravatar.cc/150?u=jorge',
   role: RoleEnum.USER,
+  name: 'Jorge',
+  surname: 'Mckinney',
+  email: 'jorge.mckinney@gmail.com',
+  phoneNumber: '+375291234567',
 };
 
 const serenity = {
   id: 'user-serenity',
   displayName: 'Serenity Jones',
   username: 'crystalrobinson',
+  imageS3Path: null,
   avatarUrl: 'https://i.pravatar.cc/150?u=serenity',
   role: RoleEnum.USER,
+  name: 'Serenity',
+  surname: 'Jones',
+  email: 'serenity.jones@gmail.com',
+  phoneNumber: '+375293456789',
 };
 
 const marcus = {
   id: 'user-marcus',
   displayName: 'Marcus Lee',
   username: 'marcuslee',
+  imageS3Path: null,
   avatarUrl: 'https://i.pravatar.cc/150?u=marcus',
   role: RoleEnum.USER,
+  name: 'Marcus',
+  surname: 'Lee',
+  email: 'marcus.lee@gmail.com',
+  phoneNumber: '+375297654321',
 };
 
 const elena = {
   id: 'user-elena',
   displayName: 'Elena Petrova',
   username: 'elena_p',
+  imageS3Path: null,
   avatarUrl: 'https://i.pravatar.cc/150?u=elena',
   role: RoleEnum.USER,
+  name: 'Elena',
+  surname: 'Petrova',
+  email: 'elena.petrova@gmail.com',
+  phoneNumber: '+375251112233',
 };
 
 export const subscriptionFeedPosts: Post[] = [

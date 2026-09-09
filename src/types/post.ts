@@ -1,8 +1,8 @@
-import type { User } from './user';
+import type { MockUser } from './user';
 
 export interface Post {
   id: string;
-  author: User;
+  author: MockUser;
   likes: number;
   content: string;
   createdAt: string;

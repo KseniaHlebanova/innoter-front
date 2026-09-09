@@ -3,18 +3,13 @@ import { Avatar } from '../Avatar/Avatar';
 import { useAppSelector } from '../../store/hooks';
 import './QuickPostCreation.css';
 import mediaIcon from '../../assets/icons/icons8-image-96.png';
-import { DEFAULT_AVATAR_URL } from '../../assets/defaultAvatar';
 
 export function QuickPostCreation() {
   const user = useAppSelector((state) => state.auth.user);
-
+  const avatarUrl = useAppSelector((state) => state.auth.avatarUrl);
   return (
     <section className="quick-post-creation" aria-label="Create a quick post">
-      <Avatar
-        src={user?.avatarUrl ?? DEFAULT_AVATAR_URL}
-        alt={user ? `${user.displayName} avatar` : 'User avatar'}
-        size="lg"
-      />
+      <Avatar src={avatarUrl} alt={user ? `${user.displayName} avatar` : 'User avatar'} size="lg" />
       <div className="quick-post-creation__content">
         <Link className="quick-post-creation__input" to="/posts/new">
           What&apos;s happening

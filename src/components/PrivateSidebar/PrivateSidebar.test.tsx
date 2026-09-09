@@ -1,6 +1,8 @@
 import { screen } from '@testing-library/react';
 import { renderWithProviders } from '../../utils/renderWithProviders';
 import { PrivateSidebar } from './PrivateSidebar';
+import { RoleEnum } from '../../api/generated/schema';
+import { DEFAULT_AVATAR_URL } from '../../assets/defaultAvatar';
 
 test('shows private navigation links', () => {
   renderWithProviders(<PrivateSidebar />, {
@@ -11,11 +13,17 @@ test('shows private navigation links', () => {
           id: 'test-uuid',
           displayName: 'Test User',
           username: 'Test User Name',
-          avatarUrl: 'https://aws.test.s3.com/test.img',
-          role: 1,
+          imageS3Path: null,
+          name: 'Test Name',
+          surname: 'Test Surname',
+          email: 'test.test@gmail.com',
+          phoneNumber: '+375297654321',
+          role: RoleEnum.USER,
         },
         profileStatus: 'succeeded',
         profileError: null,
+        avatarUrl: DEFAULT_AVATAR_URL,
+        avatarStatus: 'idle',
       },
     },
   });

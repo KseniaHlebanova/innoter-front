@@ -1,6 +1,7 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
+import { emailSchema, passwordSchema } from '../../validation/fieldSchemas';
 import { AuthFormCard } from '../../components/AuthFormCard/AuthFormCard';
 import { PrimaryButton } from '../../components/PrimaryButton/PrimaryButton';
 import { TextField } from '../../components/TextField/TextField';
@@ -19,13 +20,8 @@ interface LoginFormValues {
 }
 
 const validationSchema = Yup.object({
-  email: Yup.string().trim().email('Enter a valid email address').required('Email is required'),
-  password: Yup.string()
-    .required('Password is required')
-    .min(8, 'Password must be at least 8 characters')
-    .matches(/[A-Z]/, 'Password must contain at least one uppercase letter')
-    .matches(/[a-z]/, 'Password must contain at least one lowercase letter')
-    .matches(/\d/, 'Password must contain at least one number'),
+  email: emailSchema,
+  password: passwordSchema,
   rememberMe: Yup.boolean(),
 });
 
