@@ -1,11 +1,18 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { AuthFormCard } from '../../components/AuthFormCard/AuthFormCard';
 import { PrimaryButton } from '../../components/PrimaryButton/PrimaryButton';
 import { PhoneField } from '../../components/PhoneField/PhoneField';
 import { TextField } from '../../components/TextField/TextField';
+import { signupUser, loginUser } from '../../api/auth';
+import { ApiError } from '../../api/httpClient';
+import { saveTokens } from '../../api/tokenStorage';
+import { useAppDispatch } from '../../store/hooks';
+import { setAuthenticated } from '../../store/authSlice';
+import type { SignupPayload } from '../../types/auth';
 import './SignupPage.css';
+import { logClientError } from '../../lib/sentry';
 
 interface SignupFormValues {
   firstName: string;
@@ -18,6 +25,7 @@ interface SignupFormValues {
 
 const USERNAME_REGEX = /^[a-zA-Z][a-zA-Z0-9_]+$/;
 const PHONE_REGEX = /^\+?[1-9]\d{6,14}$/;
+const REMEMBER_ME_CHECKBOX_DEFAULT_VALUE = true;
 
 const validationSchema = Yup.object({
   firstName: Yup.string().trim().required('First name is required'),
@@ -47,6 +55,9 @@ const validationSchema = Yup.object({
 });
 
 export function SignupPage() {
+  const navigate = useNavigate();
+  const dispatch = useAppDispatch();
+
   const formik = useFormik<SignupFormValues>({
     initialValues: {
       firstName: '',
@@ -57,13 +68,47 @@ export function SignupPage() {
       password: '',
     },
     validationSchema,
-    onSubmit: async (values, { setSubmitting, setFieldError }) => {
+    onSubmit: async (values, { setSubmitting, setStatus }) => {
       try {
-        // TODO: replace with real API call to UMS:
-        console.log('submitting', values);
+        const signupPayload: SignupPayload = {
+          name: values.firstName,
+          surname: values.lastName,
+          username: values.username,
+          password: values.password,
+          email: values.email,
+          ...(values.phoneNumber ? { phone_number: values.phoneNumber } : {}),
+        };
+
+        await signupUser(signupPayload);
+
+        try {
+          const tokens = await loginUser({
+            email: values.email,
+            password: values.password,
+          });
+          saveTokens(tokens, REMEMBER_ME_CHECKBOX_DEFAULT_VALUE);
+          dispatch(setAuthenticated(true));
+          navigate('/');
+        } catch (loginErr) {
+          logClientError('Auto-login after signup failed', loginErr, {
+            component: 'SignupPage',
+            action: 'autoLoginAfterSignup',
+          });
+          navigate('/login', { state: { message: 'Account created, please log in.' } });
+        }
       } catch (err) {
-        setFieldError('username', 'Something went wrong, please try again');
-        console.error(err);
+        if (err instanceof ApiError) {
+          if (err.status === 409) {
+            setStatus('An account with this email already exists.');
+          } else {
+            setStatus(err.message);
+          }
+        } else {
+          logClientError('Unexpected error during signup', err, {
+            component: 'SignupPage',
+          });
+          setStatus('Something went wrong, please try again.');
+        }
       } finally {
         setSubmitting(false);
       }
@@ -144,6 +189,7 @@ export function SignupPage() {
           onBlur={formik.handleBlur}
           error={formik.touched.password ? formik.errors.password : undefined}
         />
+        {formik.status && <p className="signup-page__general-error">{formik.status}</p>}
         <PrimaryButton type="submit" disabled={formik.isSubmitting}>
           {formik.isSubmitting ? 'Submitting...' : 'Continue'}
         </PrimaryButton>

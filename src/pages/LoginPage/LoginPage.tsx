@@ -1,17 +1,16 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { AuthFormCard } from '../../components/AuthFormCard/AuthFormCard';
 import { PrimaryButton } from '../../components/PrimaryButton/PrimaryButton';
 import { TextField } from '../../components/TextField/TextField';
-import './LoginPage.css';
 import { loginUser } from '../../api/auth';
-import { useNavigate } from 'react-router-dom';
-import { useAppDispatch } from '../../store/hooks';
-import { setAuthenticated } from '../../store/authSlice';
 import { saveTokens } from '../../api/tokenStorage';
 import { ApiError, NetworkError } from '../../api/httpClient';
 import { logClientError } from '../../lib/sentry';
+import { useAppDispatch } from '../../store/hooks';
+import { setAuthenticated } from '../../store/authSlice';
+import './LoginPage.css';
 
 interface LoginFormValues {
   email: string;
@@ -50,6 +49,7 @@ export function LoginPage() {
         });
         saveTokens(tokens, values.rememberMe);
         dispatch(setAuthenticated(true));
+
         navigate('/');
       } catch (err) {
         if (err instanceof ApiError) {
@@ -119,6 +119,7 @@ export function LoginPage() {
           />
           Remember me
         </label>
+        {formik.status && <p className="login-page__general-error">{formik.status}</p>}
         <PrimaryButton type="submit" disabled={formik.isSubmitting}>
           {formik.isSubmitting ? 'Logging in...' : 'Login'}
         </PrimaryButton>

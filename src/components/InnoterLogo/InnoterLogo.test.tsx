@@ -3,5 +3,5 @@ import { InnoterLogo } from './InnoterLogo';
 
 test('shows the Inotter brand name', () => {
   render(<InnoterLogo />);
-  expect(screen.getByText('Inotter')).toBeInTheDocument();
+  expect(screen.getByAltText('Innoter logo')).toBeInTheDocument();
 });

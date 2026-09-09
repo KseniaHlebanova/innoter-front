@@ -1,10 +1,10 @@
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { Avatar } from '../Avatar/Avatar';
 import { InnoterLogo } from '../InnoterLogo/InnoterLogo';
-import { mockCurrentUser } from '../../features/feed/data/mockCurrentUser';
-import { useAppDispatch } from '../../store/hooks';
-import { setAuthenticated } from '../../store/authSlice';
+import { useAppDispatch, useAppSelector } from '../../store/hooks';
+import { logout } from '../../store/authSlice';
 import { clearTokens } from '../../api/tokenStorage';
+import { DEFAULT_AVATAR_URL } from '../../assets/defaultAvatar';
 import './PrivateSidebar.css';
 
 function HomeIcon() {
@@ -45,10 +45,11 @@ function LogoutIcon() {
 export function PrivateSidebar() {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const user = useAppSelector((state) => state.auth.user); // ДОБАВЛЕНО
 
   function handleLogout() {
     clearTokens();
-    dispatch(setAuthenticated(false));
+    dispatch(logout());
     navigate('/login');
   }
 
@@ -85,8 +86,8 @@ export function PrivateSidebar() {
           to="/profile"
         >
           <Avatar
-            src={mockCurrentUser.avatarUrl}
-            alt={`${mockCurrentUser.displayName} avatar`}
+            src={user?.avatarUrl ?? DEFAULT_AVATAR_URL}
+            alt={user ? `${user.displayName} avatar` : 'User avatar'}
             size="sm"
           />
           <span>Profile</span>

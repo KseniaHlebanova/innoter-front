@@ -10,6 +10,7 @@ import { refreshTokens } from './auth';
 import { store } from '../store/store';
 import { setAuthenticated } from '../store/authSlice';
 import { logApiError, logClientError } from '../lib/sentry';
+import { logout } from '../store/authSlice';
 
 export class ApiError extends Error {
   status: number;
@@ -163,7 +164,7 @@ async function request<TResponse, TBody>(
       return request<TResponse, TBody>(method, path, body, { ...options, skipRetry: true });
     } catch {
       clearTokens();
-      store.dispatch(setAuthenticated(false));
+      store.dispatch(logout());
       throw new ApiError(401, 'Session expired, please log in again');
     }
   }
